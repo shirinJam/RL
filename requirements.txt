@@ -1,0 +1,6 @@
+pandas
+numpy
+matplotlib
+gym==0.12.1
+tensorflow==1.13.1
+keras==2.3.1
