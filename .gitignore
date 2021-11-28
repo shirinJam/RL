@@ -140,6 +140,7 @@ dmypy.json
 .pyre/
 
 experiments/
+weights/
 
 .vscode/
 src/.vscode/launch.json
