@@ -38,6 +38,14 @@ def main():
 
     # Optional arguments
     parser.add_argument(
+        "--risk_aversion", 
+        default= os.getenv("RISK_AVERSION"), 
+        type=bool, 
+        required=False,
+        help="Write it")
+
+    # Optional arguments
+    parser.add_argument(
         "--continuous_action", 
         default= os.getenv("CONT_ACTION"), 
         type=bool, 
@@ -122,6 +130,7 @@ def main():
               'sabr_action': args.sabr_action,
               'random_seed': args.random_seed,
               'num_contract': args.num_contract,
+              'risk_aversion': args.risk_aversion,
               'ttm': args.ttm,
               'num_sim_train': args.num_sim_train,
               'num_sim_test': args.num_sim_test,
@@ -152,7 +161,7 @@ def main():
                             num_sim=config["num_sim_train"])
 
     logger.info(f"The option price environment was initialized successfully")
-    ddpg_trainer = DDPG(env)
+    ddpg_trainer = DDPG(env, config["risk_aversion"])
 
     # saving configurations for the experiment
     model_metadata = {
@@ -188,7 +197,7 @@ def main():
                                 spread=config["spread"], 
                                 num_contract=config["num_contract"],
                                 num_sim=config["num_sim_test"])
-    ddpg_test = DDPG(env_test)
+    ddpg_test = DDPG(env_test, config["risk_aversion"])
     ddpg_test.load()
 
     # episode for testing: 0 to 100000 inclusive
