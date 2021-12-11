@@ -26,6 +26,10 @@ class DeepRL:
 
         w_T_store = []
 
+        history = {"episode": [], "episode_w_T": [], "episode_w_T_mean": [], "episode_w_T_variance": [], 
+                    "episode_y_0": [], "rewards": [], "action_taken": [], "delta": [], "stock_price" : [],
+                    "option_price": []}
+
         for i in range(total_episode):
             observation = self.env.reset()
             done = False
@@ -70,6 +74,21 @@ class DeepRL:
                     print("episode: {} | stock price {}".format(i, self.env.path[path_row]))
                     print("episode: {} | option price {}\n".format(i, self.env.option_price_path[path_row] * 100))
 
+                history["episode"].append(i)
+                history["episode_w_T"].append(w_T)
+                history["episode_w_T_mean"].append(w_T_mean)
+                history["episode_w_T_variance"].append(w_T_var)
+                history["episode_y_0"].append(-w_T_mean + self.ra_c * np.sqrt(w_T_var))
+                history["rewards"].append(reward_store)
+                history["action_taken"].append(action_store)
+                history["delta"].append(self.env.delta_path[path_row] * 100)
+                history["stock_price"].append(self.env.path[path_row])
+                history["option_price"].append(self.env.option_price_path[path_row] * 100)
+
+                name = os.path.join(f"experiments/{os.getenv('EXPERIMENT_NO')}/history", "ddpg_test.csv")
+
+                df = pd.DataFrame.from_dict(history)
+                df.to_csv(name, index=False, encoding='utf-8')
 
     def save_history(self, history, name):
         name = os.path.join(f"experiments/{os.getenv('EXPERIMENT_NO')}/history", name)

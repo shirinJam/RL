@@ -17,7 +17,8 @@ class optionEnvironment(gym.Env):
 
     # trade_freq in unit of day, e.g 2: every 2 day; 0.5 twice a day;
     def __init__(self, cash_flow_flag=0, dg_random_seed=1, num_sim=10002, sabr_flag = False,
-        continuous_action_flag=False, spread=0, init_ttm=5, trade_freq=1, num_contract=1):
+        continuous_action_flag=False, spread=0, init_ttm=5, trade_freq=1, num_contract=1,
+        mu=0.05, vol=0.2, init_asset_val=100, strike_price=100, rf=0, dividend=0):
 
         logger.info("Inside the optionEnvironment class to initialize the environment")
 
@@ -25,10 +26,12 @@ class optionEnvironment(gym.Env):
         # generate data now
         if sabr_flag:
             self.path, self.option_price_path, self.delta_path, self.bartlett_delta_path = get_sim_path_sabr(M=init_ttm, freq=trade_freq,
-                np_seed=dg_random_seed, num_sim=num_sim)
+                np_seed=dg_random_seed, num_sim=num_sim, mu=mu, vol=vol, init_asset_val=init_asset_val,
+                strike_price=strike_price, rf=rf, dividend=dividend)
         else:
             self.path, self.option_price_path, self.delta_path = get_sim_path(M=init_ttm, freq=trade_freq,
-                np_seed=dg_random_seed, num_sim=num_sim)
+                np_seed=dg_random_seed, num_sim=num_sim, mu=mu, vol=vol, init_asset_val=init_asset_val,
+                strike_price=strike_price, rf=rf, dividend=dividend)
 
         # other attributes
         self.num_path = self.path.shape[0]

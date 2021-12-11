@@ -21,7 +21,7 @@ class DDPG(DeepRL):
     Deep Deterministic Policy Gradient
     """
 
-    def __init__(self, env):
+    def __init__(self, env, risk_constant):
         super(DDPG, self).__init__()
 
         logger.info("Initializing the Deep Deterministic Policy Gradient class variables")
@@ -42,7 +42,7 @@ class DDPG(DeepRL):
         self.critic_lr = 1e-4
 
         # risk averse constant
-        self.ra_c = 1.5
+        self.ra_c = risk_constant
 
         # actor: policy function
         # critic: Q functions; Q_ex, Q_ex2, and Q

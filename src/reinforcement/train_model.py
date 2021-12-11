@@ -1,9 +1,10 @@
 import os
 import json
+import time
 import argparse
 import logging
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from reinforcement import _version
 from reinforcement.environment.envs import optionEnvironment
@@ -138,6 +139,12 @@ def main():
               'num_episode_train': args.num_episode_train,
               'num_episode_test': args.num_episode_test,
               'spread': args.spread,
+              'mu': os.getenv("MU"),
+              'vol': os.getenv("VOL"),
+              'init_asset_price': os.getenv("INIT_ASSET_VAL"),
+              'strike_price': os.getenv("STRIKE_PRICE"),
+              'rf': os.getenv("RF"),
+              'dividend': os.getenv("DIVIDEND")
              }
 
     # set experiment number in environment variable
@@ -148,7 +155,7 @@ def main():
     logger = initialise_logger(log_level=logging.INFO)
     logger.info(f"Experiment started at {datetime.now()} with flow: {config['flow']}")
 
-
+    start_time = time.time()
     # setup for training
     # use init_ttm, spread and other arguments to train for different scenarios
     env = optionEnvironment(continuous_action_flag=config["continuous_action"],
@@ -158,11 +165,18 @@ def main():
                             trade_freq=config["trad_freq"], 
                             spread=config["spread"], 
                             num_contract=config["num_contract"],
-                            num_sim=config["num_sim_train"])
+                            num_sim=config["num_sim_train"],
+                            mu=config["mu"], 
+                            vol=config["vol"], 
+                            init_asset_val=config["init_asset_price"],
+                            strike_price=config["strike_price"], 
+                            rf=config["rf"], 
+                            dividend=config["dividend"])
 
     logger.info(f"The option price environment was initialized successfully")
     ddpg_trainer = DDPG(env, config["risk_aversion"])
 
+    training_time = (time.time() - start_time)
     # saving configurations for the experiment
     model_metadata = {
                     'version': _version.__version__,
@@ -171,6 +185,7 @@ def main():
                     'patch_version': _version.PATCH_VERSION,
                     'algorithm': 'DDPG',
                     'model_date': datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+                    'training_time': str(timedelta(seconds=training_time)),
                 }
 
     model_metadata = dict(model_metadata, **config)
@@ -196,7 +211,14 @@ def main():
                                 trade_freq=config["trad_freq"], 
                                 spread=config["spread"], 
                                 num_contract=config["num_contract"],
-                                num_sim=config["num_sim_test"])
+                                num_sim=config["num_sim_test"],
+                                mu=config["mu"], 
+                                vol=config["vol"], 
+                                init_asset_val=config["init_asset_price"],
+                                strike_price=config["strike_price"], 
+                                rf=config["rf"], 
+                                dividend=config["dividend"])
+                                
     ddpg_test = DDPG(env_test, config["risk_aversion"])
     ddpg_test.load()
 

@@ -1,8 +1,5 @@
-import subprocess
 import logging
 import sys
-import resource
-import platform
 
 
 def initialise_logger(log_level=logging.DEBUG, name="root"):
